@@ -1,0 +1,7 @@
+{
+  "name": "Planificador de Proyectos para Presentaciones",
+  "description": "Herramienta visual y ejecutiva para planificar etapas, fechas e hitos de proyectos para diapositivas y presentaciones de alto impacto.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
