@@ -548,31 +548,38 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                         )}
                       </div>
 
-                      {/* Beside Label: Positioned OUTSIDE to the right of the bar so it NEVER squishes the bar */}
-                      {plan.settings.labelPosition !== 'inside' && (
-                        <div
-                          className="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 whitespace-nowrap flex items-center gap-2 select-none pointer-events-none z-20"
-                        >
-                          <span
-                            className={`text-sm ${
-                              stage.isMilestone
-                                ? 'font-bold text-slate-900 dark:text-white'
-                                : 'font-semibold text-slate-800 dark:text-slate-200'
+                      {/* Beside Label: Positioned to the right by default, but placed to the left when near the right edge to prevent calendar overflow and scroll */}
+                      {plan.settings.labelPosition !== 'inside' && (() => {
+                        const isNearRightEdge = (stage.leftPercent + stage.widthPercent) > 65 && stage.leftPercent > 18;
+                        return (
+                          <div
+                            className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap flex items-center gap-2 select-none pointer-events-none z-20 ${
+                              isNearRightEdge
+                                ? 'right-[calc(100%+12px)] justify-end text-right'
+                                : 'left-[calc(100%+12px)] justify-start text-left'
                             }`}
                           >
-                            {stage.name}
-                          </span>
-                          {plan.settings.showDateBadges && (
                             <span
-                              className={`text-[11px] font-normal font-mono ${
-                                isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                              className={`text-sm ${
+                                stage.isMilestone
+                                  ? 'font-bold text-slate-900 dark:text-white'
+                                  : 'font-semibold text-slate-800 dark:text-slate-200'
                               }`}
                             >
-                              ({formatPresentationDate(stage.computedStartDate)} - {formatPresentationDate(stage.computedEndDate)})
+                              {stage.name}
                             </span>
-                          )}
-                        </div>
-                      )}
+                            {plan.settings.showDateBadges && (
+                              <span
+                                className={`text-[11px] font-normal font-mono ${
+                                  isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                                }`}
+                              >
+                                ({formatPresentationDate(stage.computedStartDate)} - {formatPresentationDate(stage.computedEndDate)})
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 );
@@ -609,7 +616,11 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         </div>
 
         <div className="font-mono text-[11px] text-slate-500">
-          {plan.settings.subtitle || 'Cronograma Ejecutivo'} • SAP S/4HANA
+          {plan.settings.subtitle 
+            ? (plan.settings.subtitle.toLowerCase().includes('sap') 
+                ? plan.settings.subtitle 
+                : `${plan.settings.subtitle} • SAP S/4HANA`)
+            : 'Cronograma Ejecutivo SAP S/4HANA'}
         </div>
       </div>
     </div>

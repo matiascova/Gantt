@@ -154,7 +154,7 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
     >
       <div
         id="project-manager-modal-content"
-        className="bg-white dark:bg-[#0F1E2E] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150"
+        className="bg-white dark:bg-[#0F1E2E] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-[95vw] md:w-[80vw] max-w-[80vw] overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -289,14 +289,14 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
                           onSelectProject(project.id);
                           onClose();
                         }}
-                        className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                        className={`group relative py-2.5 px-4 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                           isActive
                             ? 'bg-blue-50/70 dark:bg-blue-950/30 border-[#0070F2] shadow-xs'
                             : 'bg-white dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-slate-700 hover:shadow-xs'
                         }`}
                       >
                         {/* Left: Project Info */}
-                        <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="space-y-1 flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             {editingProjectId === project.id ? (
                               <form
@@ -341,37 +341,45 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
                             )}
                           </div>
 
-                          {/* Metadata Tags */}
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                          {/* Metadata Tags & Last Modified aligned horizontally */}
+                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                             <span className="flex items-center gap-1 font-mono">
                               <Calendar className="w-3 h-3 text-[#0070F2]" />
                               <span>Inicio: {project.startDate || 'No definida'}</span>
                             </span>
+
+                            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
 
                             <span className="flex items-center gap-1 font-mono">
                               <Clock className="w-3 h-3 text-[#0070F2]" />
                               <span>{project.totalDurationWeeks} semanas</span>
                             </span>
 
+                            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+
                             <span className="flex items-center gap-1 font-mono">
                               <Layers className="w-3 h-3 text-[#0070F2]" />
                               <span>{project.stagesCount} etapas</span>
                             </span>
 
+                            <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+
                             <span className="flex items-center gap-1">
                               <span>{country.flag}</span>
                               <span>{country.name}</span>
                             </span>
-                          </div>
 
-                          <div className="text-[11px] text-slate-400">
-                            Modificado: {formatDateTime(project.updatedAt)}
+                            <span className="text-slate-300 dark:text-slate-700 hidden md:inline">•</span>
+
+                            <span className="text-[11px] text-slate-400">
+                              Modificado: {formatDateTime(project.updatedAt)}
+                            </span>
                           </div>
                         </div>
 
                         {/* Right: Actions */}
                         <div
-                          className="flex items-center gap-1.5 self-end sm:self-center"
+                          className="flex items-center gap-1.5 self-end sm:self-center shrink-0"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {!isActive && (

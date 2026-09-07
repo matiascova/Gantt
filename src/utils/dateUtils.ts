@@ -479,7 +479,6 @@ export function buildTimelineBounds(
 
     const monthDays = daysBetween(effectiveStart, effectiveEnd) + 1;
     const startOffset = daysBetween(timelineStart, effectiveStart);
-
     const leftPercent = (startOffset / totalDays) * 100;
     const widthPercent = (monthDays / totalDays) * 100;
 
