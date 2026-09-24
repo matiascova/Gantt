@@ -25,13 +25,7 @@ import { ProjectManagerModal } from './components/ProjectManagerModal';
 import { ShareModal } from './components/ShareModal';
 import {
   Sparkles,
-  Presentation,
-  CheckCircle2,
   Layers,
-  Globe2,
-  Calendar,
-  FolderKanban,
-  Plus,
   Share2,
   Save,
   Check,
@@ -407,59 +401,6 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-6">
         
-        {/* Context Banner: SAP S/4HANA & Consecutive & Country Calendar & Active Project */}
-        <div className="bg-white dark:bg-[#0F1E2E] rounded-2xl p-4 md:p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#EBF3FC] dark:bg-[#162D44] text-[#0070F2] flex items-center justify-center flex-shrink-0 mt-0.5 font-bold">
-              <Presentation className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-slate-900 dark:text-white font-['Outfit',sans-serif]">
-                  {plan.settings.title || 'Cronograma de Proyecto SAP S/4HANA'}
-                </h2>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                  Actividades Consecutivas
-                </span>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950/60 text-[#0070F2] dark:text-blue-300">
-                  {plan.stages.length} etapas
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Calcula automáticamente las fechas de cada etapa en semanas respetando fines de semana y festivos oficiales de{' '}
-                <strong>{countryInfo.name}</strong>. Guardado automáticamente y listo para compartir.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs flex-wrap">
-            <button
-              type="button"
-              id="banner-share-link-btn"
-              onClick={handleOpenShareCurrent}
-              className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-[#0070F2] dark:text-blue-300 font-semibold flex items-center gap-1.5 border border-blue-200 dark:border-blue-800/80 transition-colors"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Compartir Enlace</span>
-            </button>
-
-            <button
-              type="button"
-              id="banner-manage-projects-btn"
-              onClick={() => setIsProjectManagerOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 transition-colors"
-            >
-              <FolderKanban className="w-3.5 h-3.5 text-[#0070F2]" />
-              <span>Mis Proyectos ({projects.length})</span>
-            </button>
-
-            <div className="px-3 py-1.5 rounded-lg bg-[#EBF3FC] dark:bg-[#122A44] text-[#004B99] dark:text-[#99C5FF] font-semibold flex items-center gap-1.5 border border-[#C7E0F8] dark:border-[#1E436D]">
-              <Globe2 className="w-3.5 h-3.5 text-[#0070F2]" />
-              <span>{countryInfo.flag} {countryInfo.name}</span>
-            </div>
-          </div>
-        </div>
-
         {/* TOP SECTION: The Visual Presentation Canvas */}
         <section className="space-y-2">
           <div className="flex items-center justify-between px-1">

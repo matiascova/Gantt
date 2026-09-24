@@ -288,20 +288,53 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
             )}
           </div>
 
-          {/* Country Calendar Badge */}
+          {/* Country Calendar Selector / Badge */}
           {plan.settings.calendar && (
             <div
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${
                 isDarkMode
                   ? 'bg-slate-900/80 border-slate-700 text-slate-300'
-                  : 'bg-[#F0F6FD] border-[#D0E2FF] text-[#004B99]'
+                  : 'bg-[#F0F6FD] border-[#D0E2FF] text-[#004B99] shadow-2xs'
               }`}
-              title="Calendario laboral con festivos"
+              title="Calendario laboral con festivos oficiales"
             >
               <span className="text-sm leading-none">{countryInfo.flag}</span>
-              <span className="font-medium text-xs">
-                {countryInfo.name}
-              </span>
+              {onUpdatePlan ? (
+                <select
+                  id="slide-country-select"
+                  value={plan.settings.calendar?.country || 'CL'}
+                  onChange={(e) =>
+                    onUpdatePlan({
+                      ...plan,
+                      settings: {
+                        ...plan.settings,
+                        calendar: {
+                          ...(plan.settings.calendar || {
+                            includeHolidays: true,
+                            workingDaysPerWeek: 5,
+                          }),
+                          country: e.target.value as any,
+                        },
+                      },
+                    })
+                  }
+                  className="text-xs font-semibold bg-transparent border-0 text-[#004B99] dark:text-blue-300 focus:ring-0 cursor-pointer pr-1 py-0.5"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option
+                      key={c.code}
+                      value={c.code}
+                      className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    >
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="font-medium text-xs">
+                  {countryInfo.name}
+                </span>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProjectPlan, SavedProject } from '../types';
-import { COLOR_THEMES, TEMPLATES } from '../data/templates';
+import { COLOR_THEMES } from '../data/templates';
 import { COUNTRIES } from '../utils/holidayUtils';
 import {
   Presentation,
@@ -8,11 +8,9 @@ import {
   Download,
   Maximize2,
   Palette,
-  Sparkles,
   Check,
   Globe2,
   FolderKanban,
-  Plus,
   Share2,
 } from 'lucide-react';
 import { toBlob } from 'html-to-image';
@@ -98,8 +96,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Project Switcher & Manager Button */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+          {/* Project Switcher & Manager */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
             <button
               type="button"
               id="btn-open-project-manager"
@@ -108,9 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-[#0070F2] dark:text-blue-400 font-bold text-xs shadow-2xs hover:bg-blue-50 dark:hover:bg-slate-600 transition-colors"
             >
               <FolderKanban className="w-3.5 h-3.5" />
-              <span className="max-w-[130px] sm:max-w-[170px] truncate">
-                {plan.settings.title || 'Mis Proyectos'}
-              </span>
+              <span>Mis Proyectos</span>
               <span className="px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-900/60 text-[#0070F2] dark:text-blue-300 text-[10px]">
                 {projects.length}
               </span>
@@ -140,19 +136,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </option>
               ))}
               <option value="__new__" className="font-bold text-[#0070F2]">
-                + Crear / Gestionar proyectos...
+                + Crear / Gestionar...
               </option>
             </select>
-
-            <button
-              type="button"
-              id="btn-quick-new-project"
-              onClick={onOpenProjectManager}
-              title="Crear nuevo proyecto"
-              className="p-1 text-slate-500 hover:text-[#0070F2] dark:hover:text-white rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
 
