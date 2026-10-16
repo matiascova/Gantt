@@ -129,7 +129,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 <input
                   type="text"
                   value={plan.settings.companyOrArea || ''}
-                  placeholder="Módulo o Área (ej. SAP S/4HANA)"
+                  placeholder="Módulo o Área (ej. ERP / Operaciones)"
                   onChange={(e) =>
                     onUpdatePlan({
                       ...plan,
@@ -151,7 +151,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                       : 'bg-[#EBF3FC] text-[#0070F2]'
                   }`}
                 >
-                  {plan.settings.companyOrArea || 'SAP S/4HANA'}
+                  {plan.settings.companyOrArea || 'ERP / Operaciones'}
                 </span>
               )}
               <span
@@ -634,7 +634,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm bg-[#C7E0F8] border border-[#85B8E8]" />
-            <span className="font-medium text-slate-700 dark:text-slate-300">Etapas Consecutivas (SAP Fiori)</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">Etapas Consecutivas</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-600" />
@@ -649,11 +649,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         </div>
 
         <div className="font-mono text-[11px] text-slate-500">
-          {plan.settings.subtitle 
-            ? (plan.settings.subtitle.toLowerCase().includes('sap') 
-                ? plan.settings.subtitle 
-                : `${plan.settings.subtitle} • SAP S/4HANA`)
-            : 'Cronograma Ejecutivo SAP S/4HANA'}
+          {plan.settings.subtitle || 'Cronograma Ejecutivo de Proyecto'}
         </div>
       </div>
     </div>

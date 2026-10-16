@@ -33,7 +33,8 @@ export interface Stage {
 export interface ColorTheme {
   id: string;
   name: string;
-  sapFamily: string;
+  family?: string;
+  sapFamily?: string;
   barColor: string;
   barHover: string;
   barText: string;

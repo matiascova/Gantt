@@ -144,7 +144,7 @@ export function expandCompactPlan(compact: CompactPlanV2): ProjectPlan {
 
   const settings: ProjectSettings = {
     id: `proj-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    title: compact.t || 'Plan de Proyecto SAP S/4HANA',
+    title: compact.t || 'Plan de Proyecto ERP',
     subtitle: compact.sub || '',
     companyOrArea: compact.cmp || '',
     startDate: compact.s || new Date().toISOString().split('T')[0],

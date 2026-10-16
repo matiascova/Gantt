@@ -3,8 +3,9 @@ import { ProjectPlan, ColorTheme } from '../types';
 export const COLOR_THEMES: ColorTheme[] = [
   {
     id: 'sap-fiori-horizon',
-    name: 'SAP S/4HANA Morning Horizon (Oficial)',
-    sapFamily: 'SAP Fiori Horizon',
+    name: 'Azul Corporativo Horizon (Ejecutivo)',
+    family: 'Azul Ejecutivo',
+    sapFamily: 'Azul Ejecutivo',
     barColor: 'bg-[#C7E0F8] border border-[#85B8E8] text-[#002B49] shadow-xs',
     barHover: 'hover:bg-[#B3D6F6]',
     barText: 'text-[#002B49]',
@@ -17,8 +18,9 @@ export const COLOR_THEMES: ColorTheme[] = [
   },
   {
     id: 'sap-quartz-light',
-    name: 'SAP S/4HANA Quartz Light (Fiori 3)',
-    sapFamily: 'SAP Fiori Quartz',
+    name: 'Gris Profesional Quartz (Moderno)',
+    family: 'Gris Profesional',
+    sapFamily: 'Gris Profesional',
     barColor: 'bg-[#D4E5F7] border border-[#91BBDF] text-[#0A2942]',
     barHover: 'hover:bg-[#C2DAF3]',
     barText: 'text-[#0A2942]',
@@ -31,8 +33,9 @@ export const COLOR_THEMES: ColorTheme[] = [
   },
   {
     id: 'sap-activate-classic',
-    name: 'SAP Activate Metodología (Azul Corporativo)',
-    sapFamily: 'SAP Activate',
+    name: 'Azul Metodología Ágil (Clásico)',
+    family: 'Metodología Ágil',
+    sapFamily: 'Metodología Ágil',
     barColor: 'bg-[#D0E2FF] border border-[#6EA8FE] text-[#002B49]',
     barHover: 'hover:bg-[#BAC8FF]',
     barText: 'text-[#002B49]',
@@ -45,8 +48,9 @@ export const COLOR_THEMES: ColorTheme[] = [
   },
   {
     id: 'sap-horizon-dark',
-    name: 'SAP S/4HANA Evening Horizon (Dark)',
-    sapFamily: 'SAP Horizon Dark',
+    name: 'Noche Tecnológica Dark (Modo Oscuro)',
+    family: 'Modo Oscuro',
+    sapFamily: 'Modo Oscuro',
     barColor: 'bg-[#183659] border border-[#37699E] text-[#F3F7FA]',
     barHover: 'hover:bg-[#204774]',
     barText: 'text-[#F3F7FA]',
@@ -59,8 +63,9 @@ export const COLOR_THEMES: ColorTheme[] = [
   },
   {
     id: 'sap-sustainability-green',
-    name: 'SAP Green Ledger & Sostenibilidad',
-    sapFamily: 'SAP Sustainability',
+    name: 'Verde Sostenibilidad & ESG (Ecológico)',
+    family: 'Sostenibilidad & ESG',
+    sapFamily: 'Sostenibilidad & ESG',
     barColor: 'bg-[#D1F0DE] border border-[#86D9A5] text-[#0B4622]',
     barHover: 'hover:bg-[#BBEACF]',
     barText: 'text-[#0B4622]',
@@ -84,15 +89,15 @@ export interface TemplatePreset {
 export const TEMPLATES: TemplatePreset[] = [
   {
     id: 'sap-s4hana-implementation',
-    name: 'SAP S/4HANA Mejora procesos importaciones (Estándar)',
-    category: 'SAP ERP',
-    description: 'Cronograma consecutivo con las etapas estándar de SAP S/4HANA (Inicio, BBP, Realización, Pruebas, Cut Over y Salida en vivo).',
+    name: 'Implementación ERP - Mejora de Procesos (Estándar)',
+    category: 'Implementación ERP',
+    description: 'Cronograma consecutivo con las etapas estándar de implementación ERP (Inicio, Definición / BBP, Realización, Pruebas, Cut Over y Salida en vivo).',
     plan: {
       settings: {
-        id: 'plan-sap-1',
+        id: 'plan-erp-1',
         title: 'Mejora procesos importaciones',
-        subtitle: 'Cronograma Ejecutivo SAP S/4HANA',
-        companyOrArea: 'Cadena de Suministro & ERP',
+        subtitle: 'Cronograma Ejecutivo de Proyecto',
+        companyOrArea: 'Cadena de Suministro & Operaciones',
         startDate: '2026-09-01',
         themeId: 'sap-fiori-horizon',
         calendar: {
@@ -117,11 +122,11 @@ export const TEMPLATES: TemplatePreset[] = [
           id: 's1',
           name: 'Inicio de proyecto',
           duration: 0.5,
-          durationUnit: 'weeks', // ~3 días laborales
+          durationUnit: 'weeks',
           startType: 'sequential',
           isMilestone: false,
           progress: 100,
-          responsible: 'Project Manager SAP',
+          responsible: 'Líder de Proyecto / PM',
           notes: 'Alineación de objetivos y kickoff con stakeholders',
         },
         {
@@ -132,7 +137,7 @@ export const TEMPLATES: TemplatePreset[] = [
           startType: 'sequential',
           isMilestone: false,
           progress: 100,
-          responsible: 'Líder Funcional MM/SD',
+          responsible: 'Líder Funcional / Procesos',
           notes: 'Business Blueprint: Diseño detallado de procesos TO-BE',
         },
         {
@@ -143,8 +148,8 @@ export const TEMPLATES: TemplatePreset[] = [
           startType: 'sequential',
           isMilestone: false,
           progress: 75,
-          responsible: 'Consultores SAP & ABAP',
-          notes: 'Parametrización del sistema y desarrollos a la medida',
+          responsible: 'Consultores & Desarrolladores',
+          notes: 'Parametrización del sistema ERP y desarrollos a la medida',
         },
         {
           id: 's4',
@@ -166,7 +171,7 @@ export const TEMPLATES: TemplatePreset[] = [
           isMilestone: false,
           progress: 0,
           responsible: 'Key Users & Consultores',
-          notes: 'Pruebas end-to-end de flujos de importación completos',
+          notes: 'Pruebas end-to-end de flujos de procesos completos',
         },
         {
           id: 's6',
@@ -176,7 +181,7 @@ export const TEMPLATES: TemplatePreset[] = [
           startType: 'sequential',
           isMilestone: false,
           progress: 0,
-          responsible: 'Gestión del Cambio OCM',
+          responsible: 'Gestión del Cambio & Capacitación',
           notes: 'Entrenamiento de usuarios finales y manuales de operación',
         },
         {
@@ -187,7 +192,7 @@ export const TEMPLATES: TemplatePreset[] = [
           startType: 'sequential',
           isMilestone: false,
           progress: 0,
-          responsible: 'Líderes de Migración & Basis',
+          responsible: 'Líderes de Migración & Sistemas',
           notes: 'Carga de datos maestros, saldos iniciales y congelamiento',
         },
         {
@@ -199,22 +204,22 @@ export const TEMPLATES: TemplatePreset[] = [
           isMilestone: true,
           milestoneIcon: 'star',
           progress: 0,
-          responsible: 'Comité Directivo & SAP Support',
-          notes: 'Go-Live oficial e inicio de soporte hiper-cuidado (Hypercare)',
+          responsible: 'Comité Directivo & Soporte',
+          notes: 'Puesta en marcha oficial e inicio de soporte hiper-cuidado (Hypercare)',
         },
       ],
     },
   },
   {
     id: 'sap-activate-migration',
-    name: 'Migración a SAP S/4HANA Cloud (Metodología SAP Activate)',
-    category: 'SAP S/4HANA Cloud',
-    description: 'Fases oficiales de SAP Activate: Prepare, Explore, Realize, Deploy y Run.',
+    name: 'Migración ERP a la Nube (Metodología por Fases)',
+    category: 'ERP Cloud',
+    description: 'Fases estándar para migración a la nube: Preparación, Exploración, Realización, Despliegue y Operación en Vivo.',
     plan: {
       settings: {
-        id: 'plan-sap-activate',
-        title: 'Transición a SAP S/4HANA Cloud',
-        subtitle: 'Metodología SAP Activate',
+        id: 'plan-erp-cloud',
+        title: 'Transición a ERP Cloud',
+        subtitle: 'Metodología de Implementación',
         companyOrArea: 'Transformación Digital',
         startDate: '2026-09-01',
         themeId: 'sap-fiori-horizon',
@@ -238,7 +243,7 @@ export const TEMPLATES: TemplatePreset[] = [
       stages: [
         {
           id: 'act-1',
-          name: 'Prepare (Preparación & Kickoff)',
+          name: 'Preparación (Kickoff & Alcance)',
           duration: 1.5,
           durationUnit: 'weeks',
           startType: 'sequential',
@@ -246,7 +251,7 @@ export const TEMPLATES: TemplatePreset[] = [
         },
         {
           id: 'act-2',
-          name: 'Explore (Workshops Fit-to-Standard)',
+          name: 'Exploración (Talleres de Procesos)',
           duration: 3,
           durationUnit: 'weeks',
           startType: 'sequential',
@@ -254,7 +259,7 @@ export const TEMPLATES: TemplatePreset[] = [
         },
         {
           id: 'act-3',
-          name: 'Realize (Configuración & Pruebas)',
+          name: 'Realización (Configuración & Pruebas)',
           duration: 5,
           durationUnit: 'weeks',
           startType: 'sequential',
@@ -262,7 +267,7 @@ export const TEMPLATES: TemplatePreset[] = [
         },
         {
           id: 'act-4',
-          name: 'Deploy (Cutover & Puesta a Punto)',
+          name: 'Despliegue (Cutover & Puesta a Punto)',
           duration: 2,
           durationUnit: 'weeks',
           startType: 'sequential',
@@ -270,7 +275,7 @@ export const TEMPLATES: TemplatePreset[] = [
         },
         {
           id: 'act-5',
-          name: 'Run & Salida en Vivo',
+          name: 'Operación & Salida en Vivo',
           duration: 1,
           durationUnit: 'weeks',
           startType: 'sequential',

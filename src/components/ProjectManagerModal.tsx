@@ -86,7 +86,7 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
 
   const handleStartCreateNew = () => {
     setActiveTab('new');
-    setNewProjectName('Nuevo Proyecto SAP S/4HANA');
+    setNewProjectName('Nuevo Proyecto ERP');
     setNewProjectStartDate(new Date().toISOString().split('T')[0]);
   };
 
@@ -486,7 +486,7 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
                   required
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  placeholder="Ej. Implementación SAP S/4HANA Logística"
+                  placeholder="Ej. Implementación ERP Logística / Operaciones"
                   className="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-[#0070F2] focus:outline-none"
                 />
               </div>

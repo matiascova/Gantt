@@ -85,9 +85,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <div className="font-extrabold text-sm text-slate-900 dark:text-white font-['Outfit',sans-serif] leading-tight flex items-center gap-1.5">
-                <span>Planificador SAP</span>
+                <span>Planificador</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-950 text-[#0070F2]">
-                  S/4HANA
+                  ERP
                 </span>
               </div>
               <div className="text-[10px] text-slate-500 font-medium leading-none">

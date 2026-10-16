@@ -406,7 +406,7 @@ export default function App() {
           <div className="flex items-center justify-between px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#0070F2]" />
-              Vista Previa de la Diapositiva (SAP S/4HANA)
+              Vista Previa de la Diapositiva (Cronograma Ejecutivo)
             </h3>
             <span className="text-[11px] text-slate-400">
               Formato ejecutivo de alta fidelidad para proyectar
@@ -424,12 +424,12 @@ export default function App() {
           />
         </section>
 
-        {/* BOTTOM SECTION: Interactive ALV Editor */}
+        {/* BOTTOM SECTION: Interactive Editor */}
         <section className="space-y-2 pt-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-[#0070F2]" />
-              ALV Grid de Etapas, Duraciones en Semanas & Calendario
+              Tabla de Etapas, Duraciones en Semanas & Calendario
             </h3>
             <span className="text-[11px] text-slate-400">
               Edición compacta y cálculo en tiempo real

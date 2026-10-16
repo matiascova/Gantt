@@ -77,14 +77,14 @@ function getInitialDefaultProjects(): SavedProject[] {
   const proj2 = createSavedProjectRecord(
     proj2Plan,
     'proj-default-2',
-    TEMPLATES[1] ? TEMPLATES[1].name : 'Implementación S/4HANA Finance'
+    TEMPLATES[1] ? TEMPLATES[1].name : 'Implementación ERP Finanzas'
   );
 
   const proj3Plan = JSON.parse(JSON.stringify(TEMPLATES[2] ? TEMPLATES[2].plan : TEMPLATES[0].plan));
   const proj3 = createSavedProjectRecord(
     proj3Plan,
     'proj-default-3',
-    TEMPLATES[2] ? TEMPLATES[2].name : 'Migración SAP ECC a Cloud'
+    TEMPLATES[2] ? TEMPLATES[2].name : 'Migración ERP a Cloud'
   );
 
   return [proj1, proj2, proj3];
@@ -162,7 +162,7 @@ export function createNewProject(
 
   const newId = `proj-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
   newPlan.settings.id = newId;
-  newPlan.settings.title = title || 'Nuevo Proyecto SAP';
+  newPlan.settings.title = title || 'Nuevo Proyecto ERP';
   if (startDate) {
     newPlan.settings.startDate = startDate;
   }

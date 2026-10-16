@@ -269,8 +269,8 @@ export const StageEditor: React.FC<StageEditorProps> = ({
     onUpdatePlan({ ...plan, stages: newStages });
   };
 
-  // Quick reset to standard SAP S/4HANA stages
-  const handleResetStandardSAP = () => {
+  // Quick reset to standard ERP stages
+  const handleResetStandardERP = () => {
     const standardStages: Stage[] = [
       {
         id: 's1',
@@ -297,7 +297,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
         durationUnit: 'weeks',
         startType: 'sequential',
         isMilestone: false,
-        notes: 'Desarrollo y parametrización SAP S/4HANA',
+        notes: 'Desarrollo y parametrización de procesos ERP',
       },
       {
         id: 's4',
@@ -403,7 +403,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
             }`}
           >
             <TableIcon className="w-3.5 h-3.5" />
-            <span>ALV Grid de Etapas ({plan.stages.length})</span>
+            <span>Tabla de Etapas ({plan.stages.length})</span>
           </button>
 
           <button
@@ -431,7 +431,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
             }`}
           >
             <Palette className="w-3.5 h-3.5" />
-            <span>Paleta SAP & Opciones</span>
+            <span>Paleta de Colores & Opciones</span>
           </button>
         </div>
 
@@ -439,12 +439,12 @@ export const StageEditor: React.FC<StageEditorProps> = ({
           <button
             type="button"
             id="quick-reset-standard-btn"
-            onClick={handleResetStandardSAP}
-            title="Cargar catálogo oficial de etapas SAP S/4HANA"
+            onClick={handleResetStandardERP}
+            title="Cargar catálogo estándar de etapas de implementación ERP"
             className="text-[11px] text-[#0070F2] hover:underline flex items-center gap-1 font-semibold px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-950/40"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Hitos SAP Estándar</span>
+            <span>Hitos Estándar ERP</span>
           </button>
         </div>
       </div>
@@ -571,7 +571,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                 id="alv-add-row-btn"
                 onClick={handleAddStage}
                 className="px-2.5 py-1 rounded bg-[#0070F2] hover:bg-[#005FB8] text-white font-semibold flex items-center gap-1 shadow-2xs transition-colors"
-                title="Insertar nueva etapa consecutiva en el ALV"
+                title="Insertar nueva etapa consecutiva en la tabla"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Insertar Etapa</span>
@@ -639,7 +639,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                 type="button"
                 onClick={() => setDensity(density === 'compact' ? 'normal' : 'compact')}
                 className="px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 flex items-center gap-1"
-                title="Alternar densidad de filas ALV"
+                title="Alternar densidad de filas de la tabla"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
                 <span className="hidden md:inline">
@@ -654,7 +654,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                 <Search className="w-3.5 h-3.5 absolute left-2 top-2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Filtrar ALV..."
+                  placeholder="Filtrar etapas..."
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
                   className="pl-7 pr-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs text-slate-800 dark:text-slate-200 w-32 sm:w-40 focus:outline-none focus:ring-1 focus:ring-[#0070F2]"
@@ -963,7 +963,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                   <td colSpan={3} className="py-2.5 px-3 border-r border-slate-300 dark:border-slate-700">
                     <div className="flex items-center gap-2">
                       <Sigma className="w-4 h-4 text-[#0070F2]" />
-                      <span>TOTAL ALV ({totalStats.totalCount} Registros)</span>
+                      <span>TOTAL ({totalStats.totalCount} Etapas)</span>
                     </div>
                   </td>
                   <td className="py-2.5 px-2 text-center font-mono text-[#0070F2] dark:text-[#4DB1FF] border-r border-slate-300 dark:border-slate-700">
@@ -1006,7 +1006,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                 País & Días Festivos Oficiales
               </h3>
               <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-[#0070F2] font-semibold">
-                Cálculo automático en ALV
+                Cálculo automático en tabla
               </span>
             </div>
             <p className="text-slate-600 dark:text-slate-400 text-[11px]">
@@ -1163,7 +1163,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                 <Palette className="w-4 h-4 text-[#0070F2]" />
-                Paleta de Colores SAP S/4HANA
+                Paleta de Colores Ejecutiva
               </h3>
             </div>
 
@@ -1194,13 +1194,13 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                           color: '#FFFFFF',
                         }}
                       >
-                        SAP
+                        ERP
                       </div>
                       <div>
                         <div className="font-bold text-slate-900 dark:text-white text-xs">
                           {theme.name}
                         </div>
-                        <div className="text-[10px] text-slate-500">{theme.sapFamily}</div>
+                        <div className="text-[10px] text-slate-500">{theme.family || theme.sapFamily}</div>
                       </div>
                     </div>
 
@@ -1263,12 +1263,12 @@ export const StageEditor: React.FC<StageEditorProps> = ({
 
                 <div>
                   <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-300 mb-1">
-                    Área o Módulo SAP
+                    Área o Módulo ERP
                   </label>
                   <input
                     type="text"
                     value={plan.settings.companyOrArea || ''}
-                    placeholder="Ej. Cadena de Suministro / MM-SD"
+                    placeholder="Ej. Finanzas, Compras, Operaciones, Logística"
                     onChange={(e) =>
                       onUpdatePlan({
                         ...plan,
