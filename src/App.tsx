@@ -11,6 +11,7 @@ import {
   createNewProject,
   createSavedProjectRecord,
   calculatePlanTotalWeeks,
+  sanitizePlan,
 } from './utils/projectStore';
 import {
   getSharedPlanFromCurrentUrl,
@@ -87,15 +88,15 @@ export default function App() {
   // Current active project plan
   const [plan, setPlan] = useState<ProjectPlan>(() => {
     if (sharedUrlData) {
-      return sharedUrlData.plan;
+      return sanitizePlan(sharedUrlData.plan);
     }
     const initialProjects = loadSavedProjects();
     const activeId = getStoredActiveProjectId(initialProjects);
     const found = initialProjects.find((p) => p.id === activeId);
     if (found && found.plan) {
-      return found.plan;
+      return sanitizePlan(found.plan);
     }
-    return initialProjects[0]?.plan || JSON.parse(JSON.stringify(TEMPLATES[0].plan));
+    return sanitizePlan(initialProjects[0]?.plan || JSON.parse(JSON.stringify(TEMPLATES[0].plan)));
   });
 
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);

@@ -648,8 +648,46 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
           )}
         </div>
 
-        <div className="font-mono text-[11px] text-slate-500">
-          {plan.settings.subtitle || 'Cronograma Ejecutivo de Proyecto'}
+        <div className="font-mono text-[11px] text-slate-500 flex items-center justify-end">
+          {onUpdatePlan ? (
+            <input
+              type="text"
+              value={
+                (plan.settings.subtitle || 'Cronograma Ejecutivo de Proyecto')
+                  .replace(/SAP\s*S\/4HANA/gi, 'ERP')
+                  .replace(/S\/4HANA/gi, 'ERP')
+                  .replace(/SAP\s*Activate/gi, 'Metodología Ágil')
+                  .replace(/SAP\s*ECC/gi, 'ERP Legacy')
+                  .replace(/SAP\s*Fiori/gi, 'Ejecutivo')
+                  .replace(/\bSAP\b/gi, 'ERP')
+                  .replace(/\s+/g, ' ')
+                  .trim()
+              }
+              onChange={(e) =>
+                onUpdatePlan({
+                  ...plan,
+                  settings: {
+                    ...plan.settings,
+                    subtitle: e.target.value,
+                  },
+                })
+              }
+              title="Haz clic para personalizar el texto al pie de la diapositiva"
+              className="text-right bg-transparent hover:bg-slate-200/50 dark:hover:bg-slate-800 px-2 py-0.5 rounded border border-transparent hover:border-dashed hover:border-slate-300 dark:hover:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#0070F2] cursor-text font-mono text-[11px] text-slate-500"
+            />
+          ) : (
+            <span>
+              {(plan.settings.subtitle || 'Cronograma Ejecutivo de Proyecto')
+                .replace(/SAP\s*S\/4HANA/gi, 'ERP')
+                .replace(/S\/4HANA/gi, 'ERP')
+                .replace(/SAP\s*Activate/gi, 'Metodología Ágil')
+                .replace(/SAP\s*ECC/gi, 'ERP Legacy')
+                .replace(/SAP\s*Fiori/gi, 'Ejecutivo')
+                .replace(/\bSAP\b/gi, 'ERP')
+                .replace(/\s+/g, ' ')
+                .trim()}
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -48,6 +48,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const blob = await toBlob(timelineContainerRef.current, {
         pixelRatio: 2.5, // Crisp 2.5x retina resolution
         cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: '',
       });
 
       if (blob && navigator.clipboard && window.ClipboardItem) {
@@ -85,6 +87,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const dataUrl = await toPng(timelineContainerRef.current, {
         pixelRatio: scale,
         cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: '',
       });
 
       const link = document.createElement('a');
@@ -112,7 +116,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       setIsExporting(true);
       setExportStatus('Generando SVG vectorial...');
 
-      const dataUrl = await toSvg(timelineContainerRef.current);
+      const dataUrl = await toSvg(timelineContainerRef.current, {
+        skipFonts: true,
+        fontEmbedCSS: '',
+      });
       const link = document.createElement('a');
       link.download = `${plan.settings.title.toLowerCase().replace(/\s+/g, '-')}-cronograma.svg`;
       link.href = dataUrl;

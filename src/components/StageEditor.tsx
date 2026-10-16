@@ -1240,6 +1240,24 @@ export const StageEditor: React.FC<StageEditorProps> = ({
                 />
               </div>
 
+              <div>
+                <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  Subtítulo / Pie de la Diapositiva (Esquina inferior derecha)
+                </label>
+                <input
+                  type="text"
+                  value={plan.settings.subtitle || ''}
+                  placeholder="Ej. Cronograma Ejecutivo de Proyecto"
+                  onChange={(e) =>
+                    onUpdatePlan({
+                      ...plan,
+                      settings: { ...plan.settings, subtitle: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-900 dark:text-white"
+                />
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label className="block text-[11px] font-medium text-slate-600 dark:text-slate-300 mb-1">

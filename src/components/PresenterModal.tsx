@@ -38,6 +38,8 @@ export const PresenterModal: React.FC<PresenterModalProps> = ({
       const blob = await toBlob(containerRef.current, {
         pixelRatio: 2.5,
         cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: '',
       });
       if (blob && navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([

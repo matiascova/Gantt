@@ -1,9 +1,53 @@
 import { ProjectPlan, SavedProject, CountryCode } from '../types';
 import { TEMPLATES } from '../data/templates';
 
-const PROJECTS_STORAGE_KEY = 'sap_project_planner_saved_projects_v3';
-const ACTIVE_PROJECT_ID_KEY = 'sap_project_planner_active_project_id_v3';
+const PROJECTS_STORAGE_KEY = 'erp_project_planner_saved_projects_v4';
+const LEGACY_SAP_STORAGE_KEY = 'sap_project_planner_saved_projects_v3';
+const ACTIVE_PROJECT_ID_KEY = 'erp_project_planner_active_project_id_v4';
+const LEGACY_SAP_ACTIVE_KEY = 'sap_project_planner_active_project_id_v3';
 const LEGACY_STORAGE_KEY = 'project_presentation_planner_data_v2';
+
+/**
+ * Cleans text of any legacy SAP / S/4HANA / Fiori references
+ */
+export function sanitizeGenericText(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(/SAP\s*S\/4HANA/gi, 'ERP')
+    .replace(/S\/4HANA/gi, 'ERP')
+    .replace(/SAP\s*Activate/gi, 'Metodología Ágil')
+    .replace(/SAP\s*ECC/gi, 'ERP Legacy')
+    .replace(/SAP\s*Fiori/gi, 'Ejecutivo')
+    .replace(/SAP\s*Support/gi, 'Soporte')
+    .replace(/SAP\s*&?\s*ABAP/gi, 'Consultores & Desarrolladores')
+    .replace(/Project\s*Manager\s*SAP/gi, 'Líder de Proyecto / PM')
+    .replace(/\bSAP\b/gi, 'ERP')
+    .replace(/\bALV\b/gi, 'Tabla')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Recursively purges any legacy SAP references from a ProjectPlan
+ */
+export function sanitizePlan(plan: ProjectPlan): ProjectPlan {
+  if (!plan) return plan;
+  return {
+    ...plan,
+    settings: {
+      ...plan.settings,
+      title: sanitizeGenericText(plan.settings.title),
+      subtitle: sanitizeGenericText(plan.settings.subtitle || 'Cronograma Ejecutivo de Proyecto'),
+      companyOrArea: sanitizeGenericText(plan.settings.companyOrArea || ''),
+    },
+    stages: (plan.stages || []).map((s) => ({
+      ...s,
+      name: sanitizeGenericText(s.name),
+      notes: s.notes ? sanitizeGenericText(s.notes) : undefined,
+      responsible: s.responsible ? sanitizeGenericText(s.responsible) : undefined,
+    })),
+  };
+}
 
 /**
  * Calculates total duration in weeks for a project plan
@@ -24,9 +68,11 @@ export function calculatePlanTotalWeeks(plan: ProjectPlan): number {
  * Creates a SavedProject object from a ProjectPlan
  */
 export function createSavedProjectRecord(plan: ProjectPlan, customId?: string, customName?: string): SavedProject {
+  const sanitizedPlan = sanitizePlan(plan);
   const now = new Date().toISOString();
-  const id = customId || plan.settings.id || `proj-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-  const name = customName || plan.settings.title || 'Proyecto sin título';
+  const id = customId || sanitizedPlan.settings.id || `proj-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  const rawName = customName || sanitizedPlan.settings.title || 'Proyecto sin título';
+  const name = sanitizeGenericText(rawName);
 
   return {
     id,
@@ -34,17 +80,17 @@ export function createSavedProjectRecord(plan: ProjectPlan, customId?: string, c
     createdAt: now,
     updatedAt: now,
     plan: {
-      ...plan,
+      ...sanitizedPlan,
       settings: {
-        ...plan.settings,
+        ...sanitizedPlan.settings,
         id,
         title: name,
       },
     },
-    stagesCount: plan.stages?.length || 0,
-    totalDurationWeeks: calculatePlanTotalWeeks(plan),
-    country: plan.settings.calendar?.country || 'MX',
-    startDate: plan.settings.startDate,
+    stagesCount: sanitizedPlan.stages?.length || 0,
+    totalDurationWeeks: calculatePlanTotalWeeks(sanitizedPlan),
+    country: sanitizedPlan.settings.calendar?.country || 'MX',
+    startDate: sanitizedPlan.settings.startDate,
   };
 }
 
@@ -59,7 +105,7 @@ function getInitialDefaultProjects(): SavedProject[] {
     if (legacy) {
       const parsed = JSON.parse(legacy);
       if (parsed?.settings && parsed?.stages) {
-        initialPlan = parsed;
+        initialPlan = sanitizePlan(parsed);
       }
     }
   } catch (e) {
@@ -72,7 +118,6 @@ function getInitialDefaultProjects(): SavedProject[] {
     initialPlan.settings.title || 'Mejora procesos importaciones'
   );
 
-  // Also include 2 alternative templates as pre-saved examples
   const proj2Plan = JSON.parse(JSON.stringify(TEMPLATES[1] ? TEMPLATES[1].plan : TEMPLATES[0].plan));
   const proj2 = createSavedProjectRecord(
     proj2Plan,
@@ -91,15 +136,36 @@ function getInitialDefaultProjects(): SavedProject[] {
 }
 
 /**
- * Loads all saved projects from localStorage
+ * Loads all saved projects from localStorage, migrating and sanitizing legacy keys
  */
 export function loadSavedProjects(): SavedProject[] {
   try {
-    const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    // 1. Try modern storage key
+    let raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    
+    // 2. Fallback to legacy key to migrate existing user data
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_SAP_STORAGE_KEY);
+    }
+
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        // Deep-sanitize every project
+        const sanitizedList = parsed.map((p: SavedProject) => {
+          const cleanPlan = sanitizePlan(p.plan);
+          return {
+            ...p,
+            name: sanitizeGenericText(p.name),
+            plan: cleanPlan,
+            stagesCount: cleanPlan.stages?.length || p.stagesCount,
+            totalDurationWeeks: calculatePlanTotalWeeks(cleanPlan),
+          };
+        });
+
+        // Save sanitized list to both keys to guarantee migration
+        saveAllProjectsToStorage(sanitizedList);
+        return sanitizedList;
       }
     }
   } catch (e) {
@@ -116,7 +182,10 @@ export function loadSavedProjects(): SavedProject[] {
  */
 export function saveAllProjectsToStorage(projects: SavedProject[]): void {
   try {
-    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+    const stringified = JSON.stringify(projects);
+    localStorage.setItem(PROJECTS_STORAGE_KEY, stringified);
+    // Also overwrite legacy key so it never retains outdated SAP strings
+    localStorage.setItem(LEGACY_SAP_STORAGE_KEY, stringified);
   } catch (e) {
     console.error('Failed to save projects to localStorage:', e);
   }
@@ -127,7 +196,10 @@ export function saveAllProjectsToStorage(projects: SavedProject[]): void {
  */
 export function getStoredActiveProjectId(projects: SavedProject[]): string {
   try {
-    const stored = localStorage.getItem(ACTIVE_PROJECT_ID_KEY);
+    let stored = localStorage.getItem(ACTIVE_PROJECT_ID_KEY);
+    if (!stored) {
+      stored = localStorage.getItem(LEGACY_SAP_ACTIVE_KEY);
+    }
     if (stored && projects.some((p) => p.id === stored)) {
       return stored;
     }
@@ -143,6 +215,7 @@ export function getStoredActiveProjectId(projects: SavedProject[]): string {
 export function setStoredActiveProjectId(id: string): void {
   try {
     localStorage.setItem(ACTIVE_PROJECT_ID_KEY, id);
+    localStorage.setItem(LEGACY_SAP_ACTIVE_KEY, id);
   } catch (e) {
     console.warn('Error saving active project ID:', e);
   }

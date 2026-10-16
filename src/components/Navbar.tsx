@@ -49,6 +49,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       const blob = await toBlob(timelineContainerRef.current, {
         pixelRatio: 2.5,
         cacheBust: true,
+        skipFonts: true,
+        fontEmbedCSS: '',
       });
 
       if (blob && navigator.clipboard && window.ClipboardItem) {
