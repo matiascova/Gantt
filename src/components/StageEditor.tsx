@@ -8,8 +8,9 @@ import {
   MilestoneIconType,
   CountryCode,
 } from '../types';
-import { COLOR_THEMES } from '../data/templates';
-import { COUNTRIES, getCountryHolidays } from '../utils/holidayUtils';
+import { COLOR_THEMES, TEMPLATES } from '../data/templates';
+import { COUNTRIES, getCountryHolidays, getHolidaysMap } from '../utils/holidayUtils';
+import { clonePlan } from '../utils/projectStore';
 import {
   formatPresentationDate,
   formatDateISO,
@@ -133,22 +134,9 @@ export const StageEditor: React.FC<StageEditorProps> = ({
       }
     }
 
-    // Build holiday map for accurate duration recalculation
+    // Build holiday map for accurate duration recalculation via memoized cache
     const baseYear = parseDate(startStr).getFullYear();
-    const holidaysMap = new Map<string, string>();
-    if (plan.settings.calendar?.includeHolidays && plan.settings.calendar.country !== 'NONE') {
-      for (let y = baseYear - 1; y <= baseYear + 4; y++) {
-        const list = getCountryHolidays(plan.settings.calendar.country, y);
-        for (const h of list) {
-          holidaysMap.set(h.date, h.name);
-        }
-      }
-    }
-    if (plan.settings.calendar?.customHolidays) {
-      for (const d of plan.settings.calendar.customHolidays) {
-        holidaysMap.set(d, 'Festivo personalizado');
-      }
-    }
+    const holidaysMap = getHolidaysMap(plan.settings.calendar, baseYear);
 
     const fixedResult = calculateWorkingDaysBetween(
       parseDate(startStr),
@@ -186,20 +174,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
         : targetWorkingDays;
 
       const baseYear = parseDate(stage.customStartDate).getFullYear();
-      const holidaysMap = new Map<string, string>();
-      if (plan.settings.calendar?.includeHolidays && plan.settings.calendar.country !== 'NONE') {
-        for (let y = baseYear - 1; y <= baseYear + 4; y++) {
-          const list = getCountryHolidays(plan.settings.calendar.country, y);
-          for (const h of list) {
-            holidaysMap.set(h.date, h.name);
-          }
-        }
-      }
-      if (plan.settings.calendar?.customHolidays) {
-        for (const d of plan.settings.calendar.customHolidays) {
-          holidaysMap.set(d, 'Festivo personalizado');
-        }
-      }
+      const holidaysMap = getHolidaysMap(plan.settings.calendar, baseYear);
 
       const { endDate } = calculateWorkingDaysSpan(
         parseDate(stage.customStartDate),
@@ -269,78 +244,9 @@ export const StageEditor: React.FC<StageEditorProps> = ({
     onUpdatePlan({ ...plan, stages: newStages });
   };
 
-  // Quick reset to standard ERP stages
+  // Quick reset to standard ERP stages from canonical template
   const handleResetStandardERP = () => {
-    const standardStages: Stage[] = [
-      {
-        id: 's1',
-        name: 'Inicio de proyecto',
-        duration: 0.5,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-        notes: 'Kickoff y alineación inicial',
-      },
-      {
-        id: 's2',
-        name: 'BBP',
-        duration: 2,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-        notes: 'Business Blueprint',
-      },
-      {
-        id: 's3',
-        name: 'Realización',
-        duration: 4,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-        notes: 'Desarrollo y parametrización de procesos ERP',
-      },
-      {
-        id: 's4',
-        name: 'Pruebas unitarias',
-        duration: 1.5,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-      },
-      {
-        id: 's5',
-        name: 'Pruebas Integrales',
-        duration: 2,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-      },
-      {
-        id: 's6',
-        name: 'Capacitación',
-        duration: 2,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-      },
-      {
-        id: 's7',
-        name: 'Cut Over',
-        duration: 1,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: false,
-      },
-      {
-        id: 's8',
-        name: 'Salida en vivo',
-        duration: 1,
-        durationUnit: 'weeks',
-        startType: 'sequential',
-        isMilestone: true,
-        milestoneIcon: 'star',
-      },
-    ];
+    const standardStages = clonePlan(TEMPLATES[0].plan.stages);
     onUpdatePlan({ ...plan, stages: standardStages });
   };
 

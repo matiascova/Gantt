@@ -6,12 +6,14 @@ import { COUNTRIES } from './utils/holidayUtils';
 import {
   loadSavedProjects,
   saveAllProjectsToStorage,
+  saveAllProjectsToStorageDebounced,
+  flushPendingStorageWrites,
+  clonePlan,
   getStoredActiveProjectId,
   setStoredActiveProjectId,
   createNewProject,
   createSavedProjectRecord,
   calculatePlanTotalWeeks,
-  sanitizePlan,
 } from './utils/projectStore';
 import {
   getSharedPlanFromCurrentUrl,
@@ -88,15 +90,15 @@ export default function App() {
   // Current active project plan
   const [plan, setPlan] = useState<ProjectPlan>(() => {
     if (sharedUrlData) {
-      return sanitizePlan(sharedUrlData.plan);
+      return sharedUrlData.plan;
     }
     const initialProjects = loadSavedProjects();
     const activeId = getStoredActiveProjectId(initialProjects);
     const found = initialProjects.find((p) => p.id === activeId);
     if (found && found.plan) {
-      return sanitizePlan(found.plan);
+      return found.plan;
     }
-    return sanitizePlan(initialProjects[0]?.plan || JSON.parse(JSON.stringify(TEMPLATES[0].plan)));
+    return initialProjects[0]?.plan || clonePlan(TEMPLATES[0].plan);
   });
 
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
@@ -108,7 +110,17 @@ export default function App() {
 
   const timelineContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync active plan changes back into the projects collection & persist
+  // Ensure any debounced pending storage writes flush before unmounting or closing window
+  useEffect(() => {
+    const handleBeforeUnload = () => flushPendingStorageWrites();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      flushPendingStorageWrites();
+    };
+  }, []);
+
+  // Sync active plan changes back into the projects collection with debounced persistence
   useEffect(() => {
     setProjects((prevProjects) => {
       const exists = prevProjects.some((p) => p.id === activeProjectId);
@@ -135,18 +147,19 @@ export default function App() {
         updated = [newRecord, ...prevProjects];
       }
 
-      saveAllProjectsToStorage(updated);
+      saveAllProjectsToStorageDebounced(updated);
       return updated;
     });
   }, [plan, activeProjectId]);
 
   // Switch active project
   const handleSelectProject = (projectId: string) => {
+    flushPendingStorageWrites();
     const found = projects.find((p) => p.id === projectId);
     if (found) {
       setActiveProjectId(projectId);
       setStoredActiveProjectId(projectId);
-      setPlan(JSON.parse(JSON.stringify(found.plan)));
+      setPlan(clonePlan(found.plan));
       setSelectedStageId(null);
     }
   };
@@ -173,7 +186,7 @@ export default function App() {
     const source = projects.find((p) => p.id === projectId);
     if (!source) return;
 
-    const copyPlan: ProjectPlan = JSON.parse(JSON.stringify(source.plan));
+    const copyPlan: ProjectPlan = clonePlan(source.plan);
     const newId = `proj-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const copyName = `${source.name} (Copia)`;
     copyPlan.settings.id = newId;
@@ -200,7 +213,7 @@ export default function App() {
       if (nextActive) {
         setActiveProjectId(nextActive.id);
         setStoredActiveProjectId(nextActive.id);
-        setPlan(JSON.parse(JSON.stringify(nextActive.plan)));
+        setPlan(clonePlan(nextActive.plan));
       }
     }
   };
@@ -237,7 +250,7 @@ export default function App() {
 
   // Save current project state as a new independent project copy
   const handleSaveCurrentAsCopy = (newName: string) => {
-    const copyPlan: ProjectPlan = JSON.parse(JSON.stringify(plan));
+    const copyPlan: ProjectPlan = clonePlan(plan);
     const newId = `proj-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     copyPlan.settings.id = newId;
     copyPlan.settings.title = newName;

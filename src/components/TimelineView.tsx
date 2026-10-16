@@ -33,6 +33,14 @@ interface TimelineViewProps {
   onUpdatePlan?: (updated: ProjectPlan) => void;
 }
 
+/**
+ * Determines whether a stage label should render to the left or right of the timeline bar
+ * to prevent calendar right-edge overflow and horizontal scrollbar creation.
+ */
+function isStageNearRightEdge(stage: ComputedStage): boolean {
+  return (stage.leftPercent + stage.widthPercent) > 65 && stage.leftPercent > 18;
+}
+
 export const TimelineView: React.FC<TimelineViewProps> = ({
   plan,
   computedStages,
@@ -582,37 +590,34 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                       </div>
 
                       {/* Beside Label: Positioned to the right by default, but placed to the left when near the right edge to prevent calendar overflow and scroll */}
-                      {plan.settings.labelPosition !== 'inside' && (() => {
-                        const isNearRightEdge = (stage.leftPercent + stage.widthPercent) > 65 && stage.leftPercent > 18;
-                        return (
-                          <div
-                            className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap flex items-center gap-2 select-none pointer-events-none z-20 ${
-                              isNearRightEdge
-                                ? 'right-[calc(100%+12px)] justify-end text-right'
-                                : 'left-[calc(100%+12px)] justify-start text-left'
+                      {plan.settings.labelPosition !== 'inside' && (
+                        <div
+                          className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap flex items-center gap-2 select-none pointer-events-none z-20 ${
+                            isStageNearRightEdge(stage)
+                              ? 'right-[calc(100%+12px)] justify-end text-right'
+                              : 'left-[calc(100%+12px)] justify-start text-left'
+                          }`}
+                        >
+                          <span
+                            className={`text-sm ${
+                              stage.isMilestone
+                                ? 'font-bold text-slate-900 dark:text-white'
+                                : 'font-semibold text-slate-800 dark:text-slate-200'
                             }`}
                           >
+                            {stage.name}
+                          </span>
+                          {plan.settings.showDateBadges && (
                             <span
-                              className={`text-sm ${
-                                stage.isMilestone
-                                  ? 'font-bold text-slate-900 dark:text-white'
-                                  : 'font-semibold text-slate-800 dark:text-slate-200'
+                              className={`text-[11px] font-normal font-mono ${
+                                isDarkMode ? 'text-slate-400' : 'text-slate-500'
                               }`}
                             >
-                              {stage.name}
+                              ({formatPresentationDate(stage.computedStartDate)} - {formatPresentationDate(stage.computedEndDate)})
                             </span>
-                            {plan.settings.showDateBadges && (
-                              <span
-                                className={`text-[11px] font-normal font-mono ${
-                                  isDarkMode ? 'text-slate-400' : 'text-slate-500'
-                                }`}
-                              >
-                                ({formatPresentationDate(stage.computedStartDate)} - {formatPresentationDate(stage.computedEndDate)})
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })()}
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

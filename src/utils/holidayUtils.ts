@@ -1,4 +1,4 @@
-import { CountryCode } from '../types';
+import { CountryCode, CalendarConfig } from '../types';
 
 export interface Holiday {
   date: string; // YYYY-MM-DD
@@ -52,10 +52,13 @@ function addDaysToDate(date: Date, days: number): Date {
 
 function formatISO(d: Date): string {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  return `${y}-${m < 10 ? '0' : ''}${m}-${day < 10 ? '0' : ''}${day}`;
 }
+
+// Global cache for calculated holidays per country and year
+const singleYearHolidaysCache = new Map<string, Holiday[]>();
 
 // Find nth weekday of a month (e.g. 1st Monday of Feb, 3rd Monday of Nov)
 function getNthWeekdayOfMonth(year: number, month: number, targetDayOfWeek: number, n: number): Date {
@@ -75,10 +78,14 @@ function moveToNextMonday(date: Date): Date {
 }
 
 /**
- * Returns list of public holidays for a given country and year
+ * Returns list of public holidays for a given country and year (memoized)
  */
 export function getCountryHolidays(country: CountryCode, year: number): Holiday[] {
   if (country === 'NONE') return [];
+
+  const cacheKey = `${country}_${year}`;
+  const existing = singleYearHolidaysCache.get(cacheKey);
+  if (existing) return existing;
 
   const easter = getEasterSunday(year);
   const holidays: Holiday[] = [];
@@ -223,5 +230,52 @@ export function getCountryHolidays(country: CountryCode, year: number): Holiday[
     }
   }
 
+  singleYearHolidaysCache.set(cacheKey, holidays);
   return holidays;
 }
+
+// In-memory cache for computed holiday maps to prevent high-frequency re-allocations
+const holidaysMapCache = new Map<string, Map<string, string>>();
+
+/**
+ * Returns a cached Map of YYYY-MM-DD -> Holiday Name for a given calendar config and base year.
+ * Covers year - 1 to year + 4 plus any custom holidays configured.
+ */
+export function getHolidaysMap(
+  calendar: CalendarConfig = { country: 'MX', includeHolidays: true, workingDaysPerWeek: 5 },
+  baseYear: number
+): Map<string, string> {
+  const country = calendar?.country || 'NONE';
+  const includeHolidays = calendar?.includeHolidays ?? true;
+  const customList = calendar?.customHolidays || [];
+  const cacheKey = `${country}_${includeHolidays}_${baseYear}_${customList.join(',')}`;
+
+  const cached = holidaysMapCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const map = new Map<string, string>();
+  if (includeHolidays && country !== 'NONE') {
+    for (let y = baseYear - 1; y <= baseYear + 4; y++) {
+      const list = getCountryHolidays(country, y);
+      for (const h of list) {
+        map.set(h.date, h.name);
+      }
+    }
+  }
+
+  if (customList.length > 0) {
+    for (const d of customList) {
+      map.set(d, 'Festivo personalizado');
+    }
+  }
+
+  if (holidaysMapCache.size > 40) {
+    holidaysMapCache.clear();
+  }
+
+  holidaysMapCache.set(cacheKey, map);
+  return map;
+}
+
