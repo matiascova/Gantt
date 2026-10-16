@@ -20,13 +20,13 @@ interface PresenterModalProps {
   bounds: TimelineBounds;
 }
 
-export const PresenterModal: React.FC<PresenterModalProps> = ({
+export const PresenterModal = React.memo<PresenterModalProps>(function PresenterModal({
   isOpen,
   onClose,
   plan,
   computedStages,
   bounds,
-}) => {
+}) {
   const [copied, setCopied] = useState(false);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -112,4 +112,4 @@ export const PresenterModal: React.FC<PresenterModalProps> = ({
       </div>
     </div>
   );
-};
+});

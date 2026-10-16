@@ -43,7 +43,7 @@ interface ProjectManagerModalProps {
   currentPlan: ProjectPlan;
 }
 
-export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
+export const ProjectManagerModal = React.memo<ProjectManagerModalProps>(function ProjectManagerModal({
   isOpen,
   onClose,
   projects,
@@ -56,7 +56,7 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
   onSaveCurrentAsCopy,
   onShareProject,
   currentPlan,
-}) => {
+}) {
   const [activeTab, setActiveTab] = useState<'list' | 'new' | 'save_copy'>('list');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -652,4 +652,4 @@ export const ProjectManagerModal: React.FC<ProjectManagerModalProps> = ({
       </div>
     </div>
   );
-};
+});

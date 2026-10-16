@@ -41,7 +41,29 @@ function isStageNearRightEdge(stage: ComputedStage): boolean {
   return (stage.leftPercent + stage.widthPercent) > 65 && stage.leftPercent > 18;
 }
 
-export const TimelineView: React.FC<TimelineViewProps> = ({
+// Static memoized milestone icon renderer to avoid re-instantiation on every render
+const MilestoneIcon = React.memo<{ icon?: MilestoneIconType; className?: string }>(function MilestoneIcon({
+  icon,
+  className = 'w-5 h-5',
+}) {
+  switch (icon) {
+    case 'flag':
+      return <Flag className={className} />;
+    case 'rocket':
+      return <Rocket className={className} />;
+    case 'check':
+      return <CheckCircle2 className={className} />;
+    case 'target':
+      return <Target className={className} />;
+    case 'diamond':
+      return <Diamond className={className} />;
+    case 'star':
+    default:
+      return <Star className={`${className} fill-amber-400 text-amber-600`} />;
+  }
+});
+
+export const TimelineView = React.memo<TimelineViewProps>(function TimelineView({
   plan,
   computedStages,
   bounds,
@@ -50,32 +72,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
   onSelectStage,
   selectedStageId,
   onUpdatePlan,
-}) => {
-  const currentTheme =
-    COLOR_THEMES.find((t) => t.id === plan.settings.themeId) || COLOR_THEMES[0];
+}) {
+  const currentTheme = React.useMemo(
+    () => COLOR_THEMES.find((t) => t.id === plan.settings.themeId) || COLOR_THEMES[0],
+    [plan.settings.themeId]
+  );
 
-  const countryInfo =
-    COUNTRIES.find((c) => c.code === plan.settings.calendar?.country) || COUNTRIES[0];
+  const countryInfo = React.useMemo(
+    () => COUNTRIES.find((c) => c.code === plan.settings.calendar?.country) || COUNTRIES[0],
+    [plan.settings.calendar?.country]
+  );
 
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
-
-  const renderMilestoneIcon = (icon?: MilestoneIconType, className: string = 'w-5 h-5') => {
-    switch (icon) {
-      case 'flag':
-        return <Flag className={className} />;
-      case 'rocket':
-        return <Rocket className={className} />;
-      case 'check':
-        return <CheckCircle2 className={className} />;
-      case 'target':
-        return <Target className={className} />;
-      case 'diamond':
-        return <Diamond className={className} />;
-      case 'star':
-      default:
-        return <Star className={`${className} fill-amber-400 text-amber-600`} />;
-    }
-  };
 
   const getBackgroundClass = () => {
     switch (plan.settings.backgroundStyle) {
@@ -397,7 +405,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                         className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
                         title="Hito Crítico / Go-Live"
                       >
-                        {renderMilestoneIcon(stage.milestoneIcon, 'w-4 h-4 stroke-[2.2]')}
+                        <MilestoneIcon icon={stage.milestoneIcon} className="w-4 h-4 stroke-[2.2]" />
                       </div>
                     ) : (
                       <div
@@ -562,10 +570,10 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                         {/* Milestone Inner Content (Star / Go-Live) */}
                         {stage.isMilestone ? (
                           <div className="flex items-center gap-1.5 font-bold">
-                            {renderMilestoneIcon(
-                              stage.milestoneIcon,
-                              'w-5 h-5 stroke-[2.2] animate-pulse'
-                            )}
+                            <MilestoneIcon
+                              icon={stage.milestoneIcon}
+                              className="w-5 h-5 stroke-[2.2] animate-pulse"
+                            />
                             {plan.settings.labelPosition === 'inside' && (
                               <span className="text-xs truncate font-bold text-amber-900">
                                 {stage.name}
@@ -697,4 +705,4 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
       </div>
     </div>
   );
-};
+});

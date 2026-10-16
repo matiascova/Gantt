@@ -29,7 +29,7 @@ interface NavbarProps {
   timelineContainerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
+export const Navbar = React.memo<NavbarProps>(function Navbar({
   plan,
   onUpdatePlan,
   onOpenExportModal,
@@ -40,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeProjectId,
   onSelectProject,
   timelineContainerRef,
-}) => {
+}) {
   const [quickCopied, setQuickCopied] = React.useState(false);
 
   const handleQuickCopy = async () => {
@@ -258,5 +258,5 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
     </header>
   );
-};
+});
 

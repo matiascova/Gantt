@@ -33,12 +33,12 @@ interface ShareModalProps {
   onImportPlan?: (importedPlan: ProjectPlan) => void;
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({
+export const ShareModal = React.memo<ShareModalProps>(function ShareModal({
   isOpen,
   onClose,
   plan,
   onImportPlan,
-}) => {
+}) {
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [shortUrl, setShortUrl] = useState<string | null>(null);
@@ -507,4 +507,4 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       </div>
     </div>
   );
-};
+});

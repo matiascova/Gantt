@@ -54,15 +54,24 @@ interface StageEditorProps {
   onSelectStage: (id: string | null) => void;
 }
 
-export const StageEditor: React.FC<StageEditorProps> = ({
+export const StageEditor = React.memo<StageEditorProps>(function StageEditor({
   plan,
   computedStages,
   onUpdatePlan,
   selectedStageId,
   onSelectStage,
-}) => {
+}) {
   const [activeTab, setActiveTab] = useState<'alv' | 'calendar' | 'settings'>('alv');
   const [searchFilter, setSearchFilter] = useState('');
+
+  // O(1) Stage ID lookup to eliminate repeated O(N^2) inner-loop array scans
+  const computedMap = useMemo(() => {
+    const map = new Map<string, ComputedStage>();
+    for (let i = 0; i < computedStages.length; i++) {
+      map.set(computedStages[i].id, computedStages[i]);
+    }
+    return map;
+  }, [computedStages]);
   const [density, setDensity] = useState<'compact' | 'normal'>('compact');
 
   // Handle stage property updates
@@ -76,7 +85,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
   // Handle switching start behavior (auto vs fecha fija vs desfase)
   const handleStartTypeChange = (stageId: string, newStartType: StartType) => {
     const stage = plan.stages.find((s) => s.id === stageId);
-    const computed = computedStages.find((c) => c.id === stageId);
+    const computed = computedMap.get(stageId);
     if (!stage) return;
 
     if (newStartType === 'custom_date') {
@@ -109,7 +118,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
     const stage = plan.stages.find((s) => s.id === stageId);
     if (!stage) return;
 
-    const currentComputed = computedStages.find((c) => c.id === stageId);
+    const currentComputed = computedMap.get(stageId);
     const startStr =
       field === 'customStartDate'
         ? newDateStr
@@ -617,7 +626,7 @@ export const StageEditor: React.FC<StageEditorProps> = ({
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                 {filteredStages.map((stage, idx) => {
                   const isSelected = selectedStageId === stage.id;
-                  const computed = computedStages.find((c) => c.id === stage.id);
+                  const computed = computedMap.get(stage.id);
                   const rowPos = (idx + 1) * 10; // Standard SAP item position (10, 20, 30...)
 
                   return (
@@ -1301,4 +1310,4 @@ export const StageEditor: React.FC<StageEditorProps> = ({
       )}
     </div>
   );
-};
+});

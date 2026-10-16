@@ -110,6 +110,10 @@ export default function App() {
 
   const timelineContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // Maintain synchronous in-memory reference to projects collection to prevent double-renders on keystroke
+  const projectsRef = useRef<SavedProject[]>(projects);
+  projectsRef.current = projects;
+
   // Ensure any debounced pending storage writes flush before unmounting or closing window
   useEffect(() => {
     const handleBeforeUnload = () => flushPendingStorageWrites();
@@ -122,68 +126,66 @@ export default function App() {
 
   // Sync active plan changes back into the projects collection with debounced persistence
   useEffect(() => {
-    setProjects((prevProjects) => {
-      const exists = prevProjects.some((p) => p.id === activeProjectId);
-      let updated: SavedProject[];
-
-      if (exists) {
-        updated = prevProjects.map((p) => {
-          if (p.id === activeProjectId) {
-            return {
-              ...p,
-              name: plan.settings.title || p.name,
-              plan: plan,
-              stagesCount: plan.stages.length,
-              totalDurationWeeks: calculatePlanTotalWeeks(plan),
-              country: plan.settings.calendar?.country || 'MX',
-              startDate: plan.settings.startDate,
-              updatedAt: new Date().toISOString(),
-            };
-          }
-          return p;
-        });
-      } else {
-        const newRecord = createSavedProjectRecord(plan, activeProjectId, plan.settings.title);
-        updated = [newRecord, ...prevProjects];
+    const updated = projectsRef.current.map((p) => {
+      if (p.id === activeProjectId) {
+        return {
+          ...p,
+          name: plan.settings.title || p.name,
+          plan: plan,
+          stagesCount: plan.stages.length,
+          totalDurationWeeks: calculatePlanTotalWeeks(plan),
+          country: plan.settings.calendar?.country || 'MX',
+          startDate: plan.settings.startDate,
+          updatedAt: new Date().toISOString(),
+        };
       }
-
-      saveAllProjectsToStorageDebounced(updated);
-      return updated;
+      return p;
     });
+
+    projectsRef.current = updated;
+    saveAllProjectsToStorageDebounced(updated);
+
+    // Debounce updating React state of projects list so fast typing does not double-render App tree
+    const timer = setTimeout(() => {
+      setProjects(updated);
+    }, 350);
+
+    return () => clearTimeout(timer);
   }, [plan, activeProjectId]);
 
-  // Switch active project
-  const handleSelectProject = (projectId: string) => {
+  // Switch active project (memoized)
+  const handleSelectProject = React.useCallback((projectId: string) => {
     flushPendingStorageWrites();
-    const found = projects.find((p) => p.id === projectId);
+    const found = projectsRef.current.find((p) => p.id === projectId);
     if (found) {
       setActiveProjectId(projectId);
       setStoredActiveProjectId(projectId);
       setPlan(clonePlan(found.plan));
       setSelectedStageId(null);
     }
-  };
+  }, []);
 
-  // Create brand new project
-  const handleCreateProject = (
+  // Create brand new project (memoized)
+  const handleCreateProject = React.useCallback((
     name: string,
     templateId: string,
     startDate: string,
     country: CountryCode
   ) => {
     const newProject = createNewProject(name, templateId, startDate, country);
-    const updated = [newProject, ...projects];
+    const updated = [newProject, ...projectsRef.current];
+    projectsRef.current = updated;
     setProjects(updated);
     saveAllProjectsToStorage(updated);
     setActiveProjectId(newProject.id);
     setStoredActiveProjectId(newProject.id);
     setPlan(newProject.plan);
     setSelectedStageId(null);
-  };
+  }, []);
 
-  // Duplicate an existing project
-  const handleDuplicateProject = (projectId: string) => {
-    const source = projects.find((p) => p.id === projectId);
+  // Duplicate an existing project (memoized)
+  const handleDuplicateProject = React.useCallback((projectId: string) => {
+    const source = projectsRef.current.find((p) => p.id === projectId);
     if (!source) return;
 
     const copyPlan: ProjectPlan = clonePlan(source.plan);
@@ -193,76 +195,85 @@ export default function App() {
     copyPlan.settings.title = copyName;
 
     const newRecord = createSavedProjectRecord(copyPlan, newId, copyName);
-    const updated = [newRecord, ...projects];
+    const updated = [newRecord, ...projectsRef.current];
+    projectsRef.current = updated;
     setProjects(updated);
     saveAllProjectsToStorage(updated);
     setActiveProjectId(newId);
     setStoredActiveProjectId(newId);
     setPlan(newRecord.plan);
-  };
+  }, []);
 
-  // Delete project
-  const handleDeleteProject = (projectId: string) => {
-    if (projects.length <= 1) return; // Don't delete if only 1
-    const updated = projects.filter((p) => p.id !== projectId);
+  // Delete project (memoized)
+  const handleDeleteProject = React.useCallback((projectId: string) => {
+    if (projectsRef.current.length <= 1) return;
+    const updated = projectsRef.current.filter((p) => p.id !== projectId);
+    projectsRef.current = updated;
     setProjects(updated);
     saveAllProjectsToStorage(updated);
 
-    if (activeProjectId === projectId) {
-      const nextActive = updated[0];
-      if (nextActive) {
-        setActiveProjectId(nextActive.id);
-        setStoredActiveProjectId(nextActive.id);
-        setPlan(clonePlan(nextActive.plan));
-      }
-    }
-  };
-
-  // Rename project
-  const handleRenameProject = (projectId: string, newName: string) => {
-    setProjects((prev) => {
-      const updated = prev.map((p) => {
-        if (p.id === projectId) {
-          const updatedPlan = {
-            ...p.plan,
-            settings: { ...p.plan.settings, title: newName },
-          };
-          return {
-            ...p,
-            name: newName,
-            plan: updatedPlan,
-            updatedAt: new Date().toISOString(),
-          };
+    setActiveProjectId((currentActive) => {
+      if (currentActive === projectId) {
+        const nextActive = updated[0];
+        if (nextActive) {
+          setStoredActiveProjectId(nextActive.id);
+          setPlan(clonePlan(nextActive.plan));
+          return nextActive.id;
         }
-        return p;
-      });
-      saveAllProjectsToStorage(updated);
-      return updated;
+      }
+      return currentActive;
+    });
+  }, []);
+
+  // Rename project (memoized)
+  const handleRenameProject = React.useCallback((projectId: string, newName: string) => {
+    const updated = projectsRef.current.map((p) => {
+      if (p.id === projectId) {
+        const updatedPlan = {
+          ...p.plan,
+          settings: { ...p.plan.settings, title: newName },
+        };
+        return {
+          ...p,
+          name: newName,
+          plan: updatedPlan,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return p;
     });
 
-    if (projectId === activeProjectId) {
-      setPlan((prevPlan) => ({
-        ...prevPlan,
-        settings: { ...prevPlan.settings, title: newName },
-      }));
-    }
-  };
+    projectsRef.current = updated;
+    setProjects(updated);
+    saveAllProjectsToStorage(updated);
 
-  // Save current project state as a new independent project copy
-  const handleSaveCurrentAsCopy = (newName: string) => {
+    setActiveProjectId((currentActive) => {
+      if (projectId === currentActive) {
+        setPlan((prevPlan) => ({
+          ...prevPlan,
+          settings: { ...prevPlan.settings, title: newName },
+        }));
+      }
+      return currentActive;
+    });
+  }, []);
+
+  // Save current project state as a new independent project copy (memoized)
+  const handleSaveCurrentAsCopy = React.useCallback((newName: string) => {
     const copyPlan: ProjectPlan = clonePlan(plan);
     const newId = `proj-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     copyPlan.settings.id = newId;
     copyPlan.settings.title = newName;
 
     const newRecord = createSavedProjectRecord(copyPlan, newId, newName);
-    const updated = [newRecord, ...projects];
+    const updated = [newRecord, ...projectsRef.current];
+    projectsRef.current = updated;
     setProjects(updated);
     saveAllProjectsToStorage(updated);
     setActiveProjectId(newId);
     setStoredActiveProjectId(newId);
     setPlan(newRecord.plan);
-  };
+  }, [plan]);
 
   // Explicit Save Shared Plan to My Projects
   const handleSaveSharedPlanToLocal = () => {

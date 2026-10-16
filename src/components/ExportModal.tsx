@@ -24,14 +24,14 @@ interface ExportModalProps {
   timelineContainerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({
+export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
   isOpen,
   onClose,
   plan,
   onImportPlan,
   onOpenShareModal,
   timelineContainerRef,
-}) => {
+}) {
   const [copySuccess, setCopySuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
@@ -334,4 +334,4 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       </div>
     </div>
   );
-};
+});

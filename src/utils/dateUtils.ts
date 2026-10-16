@@ -37,11 +37,13 @@ export const SPANISH_MONTHS_SHORT = [
   'Dic',
 ];
 
-// Helper to parse 'YYYY-MM-DD' in local timezone to avoid UTC shifts
+// Helper to parse 'YYYY-MM-DD' in local timezone to avoid UTC shifts with zero intermediate array allocations
 export function parseDate(dateStr: string): Date {
-  if (!dateStr) return new Date();
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return new Date(year, (month || 1) - 1, day || 1);
+  if (!dateStr || dateStr.length < 10) return new Date();
+  const year = +dateStr.slice(0, 4);
+  const month = +dateStr.slice(5, 7) - 1;
+  const day = +dateStr.slice(8, 10);
+  return new Date(year, month, day);
 }
 
 export function formatDateISO(d: Date): string {
@@ -449,14 +451,23 @@ export function computeStagesDates(
   };
 }
 
+// High-performance cache for computed timeline bounds to eliminate repeated month/week object allocations
+let cachedBoundsKey = '';
+let cachedBoundsResult: TimelineBounds | null = null;
+
 /**
- * Builds timeline month and week divisions for header visualization
+ * Builds timeline month and week divisions for header visualization (memoized)
  */
 export function buildTimelineBounds(
   timelineStart: Date,
   timelineEnd: Date,
   totalDays: number
 ): TimelineBounds {
+  const cacheKey = `${timelineStart.getTime()}_${timelineEnd.getTime()}_${totalDays}`;
+  if (cachedBoundsResult && cachedBoundsKey === cacheKey) {
+    return cachedBoundsResult;
+  }
+
   const months: TimelineBounds['months'] = [];
 
   let current = new Date(timelineStart.getFullYear(), timelineStart.getMonth(), 1);
@@ -510,10 +521,14 @@ export function buildTimelineBounds(
     current = new Date(year, monthIdx + 1, 1);
   }
 
-  return {
+  const result: TimelineBounds = {
     startDate: timelineStart,
     endDate: timelineEnd,
     totalDays,
     months,
   };
+
+  cachedBoundsKey = cacheKey;
+  cachedBoundsResult = result;
+  return result;
 }
