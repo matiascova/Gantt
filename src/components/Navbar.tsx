@@ -249,7 +249,7 @@ export const Navbar = React.memo<NavbarProps>(function Navbar({
             id="export-modal-btn"
             onClick={onOpenExportModal}
             className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium flex items-center gap-1"
-            title="Descargar imagen PNG / SVG en alta resolución"
+            title="Descargar imagen PNG / SVG o planilla Excel (.xlsx)"
           >
             <Download className="w-4 h-4" />
             <span className="hidden md:inline">Descargar</span>

@@ -501,6 +501,7 @@ export default function App() {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         plan={plan}
+        computedStages={computedStages}
         onImportPlan={(imported) => {
           setPlan(imported);
           setIsExportModalOpen(false);

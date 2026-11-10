@@ -18,6 +18,8 @@ import {
   calculateWorkingDaysBetween,
   calculateWorkingDaysSpan,
 } from '../utils/dateUtils';
+import { exportPlanToExcel } from '../utils/excelExport';
+import confetti from 'canvas-confetti';
 import {
   Plus,
   Trash2,
@@ -257,6 +259,17 @@ export const StageEditor = React.memo<StageEditorProps>(function StageEditor({
   const handleResetStandardERP = () => {
     const standardStages = clonePlan(TEMPLATES[0].plan.stages);
     onUpdatePlan({ ...plan, stages: standardStages });
+  };
+
+  // Download project stages & calendar in Excel format (.xlsx)
+  const handleExportExcel = () => {
+    exportPlanToExcel(plan, computedStages);
+    confetti({
+      particleCount: 45,
+      spread: 60,
+      origin: { y: 0.8 },
+      colors: ['#10B981', '#059669', '#34D399', '#6EE7B7'],
+    });
   };
 
   const currentYear = parseDate(plan.settings.startDate).getFullYear();
@@ -560,6 +573,20 @@ export const StageEditor = React.memo<StageEditorProps>(function StageEditor({
                 <span className="hidden md:inline">
                   {density === 'compact' ? 'Vista Compacta' : 'Vista Cómoda'}
                 </span>
+              </button>
+
+              <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-0.5" />
+
+              {/* Export to Excel (.xlsx) */}
+              <button
+                type="button"
+                id="btn-export-excel-table"
+                onClick={handleExportExcel}
+                className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold flex items-center gap-1.5 shadow-2xs transition-all text-xs"
+                title="Bajar esta tabla de etapas y calendario calculada en formato Excel (.xlsx)"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Bajar Excel</span>
               </button>
             </div>
 

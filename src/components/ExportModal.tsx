@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ProjectPlan } from '../types';
+import { ProjectPlan, ComputedStage } from '../types';
 import { toPng, toSvg, toBlob } from 'html-to-image';
 import confetti from 'canvas-confetti';
+import { exportPlanToExcel } from '../utils/excelExport';
 import {
   X,
   Copy,
@@ -13,12 +14,14 @@ import {
   Image as ImageIcon,
   Loader2,
   Share2,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   plan: ProjectPlan;
+  computedStages?: ComputedStage[];
   onImportPlan: (plan: ProjectPlan) => void;
   onOpenShareModal?: () => void;
   timelineContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -28,6 +31,7 @@ export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
   isOpen,
   onClose,
   plan,
+  computedStages,
   onImportPlan,
   onOpenShareModal,
   timelineContainerRef,
@@ -126,6 +130,26 @@ export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
       link.click();
     } catch (err) {
       console.error('Error downloading SVG', err);
+    } finally {
+      setIsExporting(false);
+      setExportStatus(null);
+    }
+  };
+
+  // Download Excel Spreadsheet (.xlsx)
+  const handleDownloadExcel = () => {
+    try {
+      setIsExporting(true);
+      setExportStatus('Generando archivo Excel (.xlsx)...');
+      exportPlanToExcel(plan, computedStages || []);
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.8 },
+        colors: ['#10B981', '#059669', '#34D399', '#6EE7B7'],
+      });
+    } catch (err) {
+      console.error('Error exporting to Excel', err);
     } finally {
       setIsExporting(false);
       setExportStatus(null);
@@ -243,7 +267,24 @@ export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
             Descargar Archivos
           </label>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            {/* Excel (.xlsx) */}
+            <button
+              type="button"
+              id="download-excel-btn"
+              onClick={handleDownloadExcel}
+              disabled={isExporting}
+              className="p-3 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/40 text-left hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 transition-colors flex flex-col gap-1 shadow-2xs group"
+            >
+              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold text-xs">
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+                Planilla Excel (.xlsx)
+              </div>
+              <span className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 leading-tight">
+                Tabla con fechas, duraciones y feriados
+              </span>
+            </button>
+
             <button
               type="button"
               id="download-hd-png-btn"
@@ -255,7 +296,7 @@ export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
                 <ImageIcon className="w-4 h-4" />
                 Descargar PNG (HD 2x)
               </div>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 leading-tight">
                 Ideal para proyectar o imprimir
               </span>
             </button>
@@ -271,7 +312,7 @@ export const ExportModal = React.memo<ExportModalProps>(function ExportModal({
                 <Download className="w-4 h-4" />
                 Descargar SVG
               </div>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 leading-tight">
                 Vectorial sin pérdida de calidad
               </span>
             </button>
